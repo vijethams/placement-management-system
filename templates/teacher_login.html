@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Login{% endblock %}
+
+{% block content %}
+<div class="container login-layout">
+    <div class="login-info">
+        <div class="login-hero">
+            <div class="illustration" aria-hidden="true">
+                <!-- Simple inline SVG hero illustration (placeholder) -->
+                <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Hero illustration">
+                    <defs>
+                        <linearGradient id="g1" x1="0" x2="1">
+                            <stop offset="0" stop-color="#dbeafe"/>
+                            <stop offset="1" stop-color="#e0f2fe"/>
+                        </linearGradient>
+                    </defs>
+                    <rect x="10" y="10" width="280" height="280" rx="28" fill="url(#g1)" stroke="#fff" stroke-opacity="0.6"/>
+                    <g transform="translate(80,70)">
+                        <circle cx="60" cy="30" r="28" fill="#fff" stroke="#c7e3ff" stroke-width="6"/>
+                        <rect x="18" y="72" width="84" height="46" rx="12" fill="#fff" stroke="#c7e3ff"/> 
+                        <text x="60" y="35" text-anchor="middle" font-size="22" fill="#1e40af" font-weight="700">AI</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+    </div>
+    <div class="login-card">
+        <div class="login-header">
+            <h1>Hello!<br/>Welcome Back!</h1>
+            <p>Let's Login to Your Account</p>
+        </div>
+
+        <form method="POST" class="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter username" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="DDMMYYYY" required>
+            </div>
+
+            <button type="submit" class="login-btn">Login</button>
+            <div style="display:flex; justify-content:flex-end; margin-top:0.45rem;"><a href="#" class="form-help">Forgot Password?</a></div>
+        </form>
+
+        <div style="margin-top: 0.85rem; display:flex; justify-content:space-between; align-items:center;">
+            <small>Don't have an account? <a href="{{ url_for('add_teacher') }}">Sign Up</a></small>
+            <a href="{{ url_for('index') }}" target="_self" class="btn btn-outline btn-sm">← Back to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

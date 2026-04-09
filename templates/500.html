@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - Placement Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+        text-align: center;
+    }
+
+    .error-content {
+        padding: 2rem;
+    }
+
+    .error-code {
+        font-size: 5rem;
+        font-weight: 700;
+        color: #dc2626;
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        font-size: 1.5rem;
+        color: #475569;
+        margin-bottom: 1rem;
+    }
+
+    .error-description {
+        color: #64748b;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-code">500</div>
+        <div class="error-message">Internal Server Error</div>
+        <div class="error-description">
+            <p>Something went wrong on our end. Please try again later.</p>
+        </div>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - Placement Management System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 70vh;
+        text-align: center;
+    }
+
+    .error-content {
+        padding: 2rem;
+    }
+
+    .error-code {
+        font-size: 5rem;
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        font-size: 1.5rem;
+        color: #475569;
+        margin-bottom: 1rem;
+    }
+
+    .error-description {
+        color: #64748b;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-code">404</div>
+        <div class="error-message">Page Not Found</div>
+        <div class="error-description">
+            <p>The page you're looking for doesn't exist or has been moved.</p>
+        </div>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

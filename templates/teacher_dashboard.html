@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard - Placement Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-full">
+        <h1>Teacher Dashboard</h1>
+        <p class="text-muted">Welcome, {{ teacher.full_name }}. Manage your classes and students.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="stat-box primary">
+            <div class="stat-box-value">{{ classes_count }}</div>
+            <div class="stat-box-label">Classes</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-box info">
+            <div class="stat-box-value">{{ students_count }}</div>
+            <div class="stat-box-label">Total Students</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col col-full">
+        <!-- Search Form -->
+        <div style="margin-bottom: 1.5rem;">
+            <form style="display: flex; align-items: center; gap: 0.5rem;">
+                <label style="font-size: 0.9rem; font-weight: 500; white-space: nowrap;">Search:</label>
+                <input type="text" id="classSearch" placeholder="" style="padding: 0.6rem; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 0.25rem; width: 300px;">
+                <a href="#" id="clearSearch" class="btn btn-sm btn-secondary" style="font-size: 0.8rem; padding: 0.4rem; text-align: center; display: none;">Clear</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col col-full">
+        <div class="card">
+            <div class="card-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>Your Classes</h3>
+                    <a href="{{ url_for('add_class') }}" class="btn btn-sm btn-primary">➕ Add Class</a>
+                </div>
+            </div>
+
+            {% if classes %}
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; padding: 1.5rem 0;">
+                    {% for class in classes %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>{{ class.course }}</h4>
+                            <p class="text-muted">{{ class.specialisation }}</p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.85rem;" class="text-muted">
+                                Created by: <strong>{{ class.teacher.full_name if class.teacher else 'Unknown' }}</strong>
+                            </p>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Students:</strong> {{ class.students|length }}</p>
+                            <p><strong>Placed:</strong> {{ class.students|selectattr('company_name')|list|length }}</p>
+                            <p style="margin: 0;"><small class="text-muted">Created: {{ class.created_at.strftime('%d %b %Y') }}</small></p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ url_for('class_dashboard', class_id=class.id) }}" class="btn btn-sm btn-primary">Open</a>
+                            <a href="{{ url_for('edit_class', class_id=class.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+                            <form method="POST" action="{{ url_for('delete_class', class_id=class.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card-body">
+                    <p class="text-muted text-center">No classes yet. <a href="{{ url_for('add_class') }}">Create one</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('classSearch');
+    const clearBtn = document.getElementById('clearSearch');
+    const classesContainer = document.querySelector('[style*="grid"]');
+    
+    if (!searchInput || !classesContainer) return;
+    
+    // Get all class cards
+    const classCards = classesContainer.querySelectorAll('.card');
+    
+    // Initial value from URL if exists
+    searchInput.value = "{{ search_query or '' }}";
+    if (searchInput.value) {
+        clearBtn.style.display = 'block';
+    }
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        let visibleCount = 0;
+        
+        classCards.forEach(card => {
+            const header = card.querySelector('.card-header');
+            if (!header) return;
+            
+            const course = header.querySelector('h4')?.textContent?.toLowerCase() || '';
+            const specialisation = header.querySelector('p:nth-of-type(1)')?.textContent?.toLowerCase() || '';
+            const teacher = header.querySelector('p:nth-of-type(2)')?.textContent?.toLowerCase() || '';
+            
+            if (course.includes(searchTerm) || specialisation.includes(searchTerm) || teacher.includes(searchTerm)) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Show/hide clear button
+        if (searchTerm) {
+            clearBtn.style.display = 'block';
+        } else {
+            clearBtn.style.display = 'none';
+        }
+        
+        // Show "no results" message if needed
+        if (visibleCount === 0 && searchTerm) {
+            if (!document.getElementById('noResults')) {
+                const noResults = document.createElement('div');
+                noResults.id = 'noResults';
+                noResults.style.cssText = 'text-align: center; color: #999; padding: 2rem; grid-column: 1 / -1;';
+                noResults.textContent = 'No matching classes found';
+                classesContainer.appendChild(noResults);
+            }
+        } else {
+            const noResults = document.getElementById('noResults');
+            if (noResults) noResults.remove();
+        }
+    });
+    
+    // Clear button
+    clearBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        searchInput.focus();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Student - Placement Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-full">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Edit Student: {{ student.full_name }}</h1>
+                <p class="text-muted">USN: {{ student.usn }}</p>
+            </div>
+            <div>
+                <a href="{{ url_for('view_student', student_id=student.id) }}" class="btn btn-secondary">← Back to Student</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col col-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>Update Student Information</h3>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" class="card-body">
+                <!-- Personal Information -->
+                <fieldset style="margin-bottom: 2rem;">
+                    <legend style="font-weight: 600; margin-bottom: 1rem; font-size: 1rem;">Personal Information</legend>
+
+                    <div class="form-group">
+                        <label for="full_name" class="required">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" value="{{ student.full_name }}" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email_id" class="required">Email ID</label>
+                            <input type="email" id="email_id" name="email_id" value="{{ student.email_id }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone_number" class="required">Phone Number</label>
+                            <input type="text" id="phone_number" name="phone_number" value="{{ student.phone_number }}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mother_tongue">Mother Tongue</label>
+                        <select id="mother_tongue" name="mother_tongue">
+                            <option value="">Select Language</option>
+                            <option value="en" {% if student.mother_tongue == 'en' %}selected{% endif %}>English</option>
+                            <option value="hi" {% if student.mother_tongue == 'hi' %}selected{% endif %}>Hindi</option>
+                            <option value="ta" {% if student.mother_tongue == 'ta' %}selected{% endif %}>Tamil</option>
+                            <option value="te" {% if student.mother_tongue == 'te' %}selected{% endif %}>Telugu</option>
+                            <option value="ka" {% if student.mother_tongue == 'ka' %}selected{% endif %}>Kannada</option>
+                            <option value="ml" {% if student.mother_tongue == 'ml' %}selected{% endif %}>Malayalam</option>
+                            <option value="mr" {% if student.mother_tongue == 'mr' %}selected{% endif %}>Marathi</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <!-- Parent Information -->
+                <fieldset style="margin-bottom: 2rem;">
+                    <legend style="font-weight: 600; margin-bottom: 1rem; font-size: 1rem;">Parent Information</legend>
+
+                    <div class="form-group">
+                        <label for="parent_name" class="required">Parent Name</label>
+                        <input type="text" id="parent_name" name="parent_name" value="{{ student.parent_name }}" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="parent_email" class="required">Parent Email</label>
+                            <input type="email" id="parent_email" name="parent_email" value="{{ student.parent_email }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="parent_phone" class="required">Parent Phone</label>
+                            <input type="text" id="parent_phone" name="parent_phone" value="{{ student.parent_phone }}" required>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Placement Information -->
+                <fieldset style="margin-bottom: 2rem;">
+                    <legend style="font-weight: 600; margin-bottom: 1rem; font-size: 1rem;">Placement Information</legend>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="company_name">Company Name</label>
+                            <input type="text" id="company_name" name="company_name" value="{{ student.company_name or '' }}" placeholder="e.g., TCS, Infosys, Wipro">
+                        </div>
+                        <div class="form-group">
+                            <label for="package">Package (LPA)</label>
+                            <input type="text" id="package" name="package" value="{{ student.package or '' }}" placeholder="e.g., 8.5 LPA">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmation_letter">Company Confirmation Letter</label>
+                        <input type="file" id="confirmation_letter" name="confirmation_letter" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        <small class="form-help">Accepted: PDF, DOC, DOCX, JPG, PNG (Max 10MB)</small>
+                        {% if student.confirmation_letter_path %}
+                        <p style="margin-top: 0.5rem;">
+                            <small class="text-muted">Current: <a href="{{ student.confirmation_letter_path }}">{{ student.confirmation_letter_path.split('/')[-1] }}</a></small>
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    {% if student.notification_sent %}
+                    <div class="alert alert-info">
+                        <strong>✓ Notification Sent</strong><br>
+                        Parent notified on {{ student.notification_sent_at.strftime('%d %b %Y %H:%M') }}
+                    </div>
+                    {% endif %}
+                </fieldset>
+
+                <!-- WhatsApp Notification Settings - Always Enabled by Default -->
+                <input type="hidden" name="send_whatsapp" value="1">
+
+                <div class="card-footer" style="border: none; padding: 0;">
+                    <a href="{{ url_for('view_student', student_id=student.id) }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">✏️ Update Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h3>Student Details</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>USN:</strong> {{ student.usn }}</p>
+                <p><strong>Class:</strong> {{ student.class_ref.course }} - {{ student.class_ref.specialisation }}</p>
+                <p><strong>Created:</strong> {{ student.created_at.strftime('%d %b %Y') }}</p>
+                <p><strong>Last Updated:</strong> {{ student.updated_at.strftime('%d %b %Y %H:%M') }}</p>
+
+                <h4 style="margin-top: 1.5rem;">Placement Status</h4>
+                {% if student.company_name and student.package %}
+                    <div class="alert alert-success">
+                        ✅ <strong>Placed</strong><br>
+                        Company: {{ student.company_name }}<br>
+                        Package: {{ student.package }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        ⏳ <strong>Unplaced</strong><br>
+                        Fill company name and package to mark as placed
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Actions</h3>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('view_student', student_id=student.id) }}" class="btn btn-sm btn-block btn-info" style="margin-bottom: 0.5rem;">📋 View Details</a>
+                <form method="POST" action="{{ url_for('delete_student', student_id=student.id) }}" style="display: block;" onsubmit="return confirm('Are you sure? This cannot be undone.');">
+                    <button type="submit" class="btn btn-sm btn-block btn-danger">🗑️ Delete Student</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

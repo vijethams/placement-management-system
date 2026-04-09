@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Add Teacher - Placement Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-full">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Add New Teacher</h1>
+                <p class="text-muted">Create a new teacher login account</p>
+            </div>
+            <div>
+                <a href="javascript:history.back()" class="btn btn-secondary">← Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col col-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>Teacher Details</h3>
+            </div>
+
+            <form method="POST" class="card-body">
+                <div class="form-group">
+                    <label for="username" class="required">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Unique login username" required>
+                    <small class="form-help">This will be used for login</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="required">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Strong password" required>
+                    <small class="form-help">Minimum 8 characters recommended</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" placeholder="Teacher's full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="teacher@example.com">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" id="phone" name="phone" placeholder="+91 XXXXX XXXXX">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input type="text" id="department" name="department" placeholder="e.g., Computer Science">
+                    </div>
+                </div>
+
+                <div class="card-footer" style="border: none; padding: 0; margin-top: 2rem;">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">➕ Create Teacher Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h3>Important Notes</h3>
+            </div>
+            <div class="card-body">
+                <h4>Account Creation</h4>
+                <ul style="padding-left: 1.5rem;">
+                    <li>Username must be unique</li>
+                    <li>Password should be strong and secure</li>
+                    <li>Share credentials securely with teacher</li>
+                </ul>
+
+                <h4 style="margin-top: 1.5rem;">Teacher Capabilities</h4>
+                <ul style="padding-left: 1.5rem;">
+                    <li>Create and manage classes</li>
+                    <li>Add and edit students</li>
+                    <li>Track placements</li>
+                    <li>View student details</li>
+                    <li>Generate notifications</li>
+                </ul>
+
+                <h4 style="margin-top: 1.5rem;">Security</h4>
+                <ul style="padding-left: 1.5rem;">
+                    <li>Passwords are securely hashed</li>
+                    <li>Only admin can create teacher accounts</li>
+                    <li>Each teacher sees only their classes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

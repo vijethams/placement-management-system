@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Add Student - Placement Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-full">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Add Student to {{ class_obj.course }} - {{ class_obj.specialisation }}</h1>
+            </div>
+            <div>
+                <a href="{{ url_for('class_dashboard', class_id=class_obj.id) }}" class="btn btn-secondary">← Back to Class</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col col-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>Student Information</h3>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data" class="card-body">
+                <!-- Personal Information -->
+                <fieldset style="margin-bottom: 2rem;">
+                    <legend style="font-weight: 600; margin-bottom: 1rem; font-size: 1rem;">Personal Information</legend>
+
+                    <div class="form-group">
+                        <label for="usn" class="required">USN (University Serial Number)</label>
+                        <input type="text" id="usn" name="usn" placeholder="e.g., 1PL19IS001" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="full_name" class="required">Full Name</label>
+                        <input type="text" id="full_name" name="full_name" placeholder="Student's full name" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email_id" class="required">Email ID</label>
+                            <input type="email" id="email_id" name="email_id" placeholder="student@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone_number" class="required">Phone Number</label>
+                            <input type="text" id="phone_number" name="phone_number" placeholder="+91 XXXXX XXXXX" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mother_tongue">Mother Tongue</label>
+                        <select id="mother_tongue" name="mother_tongue">
+                            <option value="">Select Language</option>
+                            <option value="en">English</option>
+                            <option value="hi">Hindi</option>
+                            <option value="ta">Tamil</option>
+                            <option value="te">Telugu</option>
+                            <option value="ka">Kannada</option>
+                            <option value="ml">Malayalam</option>
+                            <option value="mr">Marathi</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <!-- Parent Information -->
+                <fieldset style="margin-bottom: 2rem;">
+                    <legend style="font-weight: 600; margin-bottom: 1rem; font-size: 1rem;">Parent Information</legend>
+
+                    <div class="form-group">
+                        <label for="parent_name" class="required">Parent Name</label>
+                        <input type="text" id="parent_name" name="parent_name" placeholder="Parent's full name" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="parent_email" class="required">Parent Email</label>
+                            <input type="email" id="parent_email" name="parent_email" placeholder="parent@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="parent_phone" class="required">Parent Phone</label>
+                            <input type="text" id="parent_phone" name="parent_phone" placeholder="+91 XXXXX XXXXX" required>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Placement Information -->
+                <fieldset style="margin-bottom: 2rem;">
+                    <legend style="font-weight: 600; margin-bottom: 1rem; font-size: 1rem;">Placement Information (Optional)</legend>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="company_name">Company Name</label>
+                            <input type="text" id="company_name" name="company_name" placeholder="e.g., TCS, Infosys, Wipro">
+                            <small class="form-help">Leave empty if not placed yet</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="package">Package (LPA)</label>
+                            <input type="text" id="package" name="package" placeholder="e.g., 8.5 LPA">
+                            <small class="form-help">Leave empty if not placed yet</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmation_letter">Company Confirmation Letter</label>
+                        <input type="file" id="confirmation_letter" name="confirmation_letter" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        <small class="form-help">Accepted: PDF, DOC, DOCX, JPG, PNG (Max 10MB)</small>
+                    </div>
+                </fieldset>
+
+                <!-- WhatsApp Notification Settings - Always Enabled by Default -->
+                <input type="hidden" name="send_whatsapp" value="1">
+
+                <div class="card-footer" style="border: none; padding: 0;">
+                    <a href="{{ url_for('class_dashboard', class_id=class_obj.id) }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">➕ Add Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h3>Instructions</h3>
+            </div>
+            <div class="card-body">
+                <h4>Fields Guide</h4>
+                <ul style="padding-left: 1.5rem;">
+                    <li><strong>Required Fields:</strong> All marked with *</li>
+                    <li><strong>Company Name & Package:</strong> Fill these to trigger automatic notification</li>
+                    <li><strong>Confirmation Letter:</strong> Upload placement confirmation from company</li>
+                </ul>
+
+                <h4 style="margin-top: 1.5rem;">Automatic Actions</h4>
+                <p>When you fill Company Name and Package:</p>
+                <ul style="padding-left: 1.5rem;">
+                    <li>📱 WhatsApp message sent to parent</li>
+                    <li>🔊 Voice message generated in parent's language</li>
+                    <li>✅ Status marked as "Placed"</li>
+                </ul>
+
+                <h4 style="margin-top: 1.5rem;">Note</h4>
+                <p style="margin: 0;"><small>Ensure WhatsApp Web is open in browser for notifications to be sent.</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

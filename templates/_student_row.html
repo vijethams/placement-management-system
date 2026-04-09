@@ -1,0 +1,46 @@
+<tr id="student-row-{{ student.id }}">
+    <td class="cell-usn"><strong>{{ student.usn }}</strong></td>
+    <td class="cell-name">{{ student.full_name }}</td>
+    <td class="cell-email">{{ student.email_id }}</td>
+    <td class="cell-phone">{{ student.phone_number }}</td>
+    <td class="cell-company">{{ student.company_name or '-' }}</td>
+    <td class="cell-package">{{ student.package or '-' }}</td>
+    <td class="cell-status">
+        {% if student.company_name %}
+            <span class="badge badge-success">Placed</span>
+        {% else %}
+            <span class="badge badge-warning">Unplaced</span>
+        {% endif %}
+    </td>
+    <td class="cell-whatsapp">
+        {% if student.company_name and student.package %}
+            <div class="whatsapp-status" data-student-id="{{ student.id }}" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                {% if student.whatsapp_notification_sent %}
+                    <span class="status-indicator" style="width: 12px; height: 12px; border-radius: 50%; background-color: #28a745;" title="WhatsApp message sent"></span>
+                    <span style="font-size: 0.8rem; color: #28a745;">Sent</span>
+                {% else %}
+                    {% if student.last_whatsapp_status == 'queued' %}
+                        <span class="status-indicator" style="width: 12px; height: 12px; border-radius: 50%; background-color: #0d6efd;" title="WhatsApp message queued"></span>
+                        <span style="font-size: 0.8rem; color: #0d6efd;">Queued</span>
+                    {% else %}
+                        <span class="status-indicator" style="width: 12px; height: 12px; border-radius: 50%; background-color: #dc3545;" title="Click to send WhatsApp message"></span>
+                        <span style="font-size: 0.8rem; color: #dc3545;">Not Sent</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% else %}
+            <span style="font-size: 0.8rem; color: #999;">-</span>
+        {% endif %}
+    </td>
+    <td class="cell-action-view">
+        <a href="{{ url_for('view_student', student_id=student.id) }}" class="btn btn-sm btn-info">View</a>
+    </td>
+    <td class="cell-action-edit">
+        <a href="{{ url_for('edit_student', student_id=student.id) }}" class="btn btn-sm btn-edit">Edit</a>
+    </td>
+    <td class="cell-action-delete">
+        <form method="POST" action="{{ url_for('delete_student', student_id=student.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure?');">
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+    </td>
+</tr>

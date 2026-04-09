@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Placement Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                {% if session.get('teacher_id') %}
+                    <a href="{{ url_for('teacher_dashboard') }}" class="logo">Placement Management System</a>
+                {% elif session.get('admin_id') %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="logo">Placement Management System</a>
+                {% else %}
+                    <a href="{{ url_for('index') }}" class="logo">Placement Management System</a>
+                {% endif %}
+                <ul class="nav-menu">
+                    {% if session.get('admin_id') %}
+                        <li class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                            <a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a>
+                        </li>
+                        <li class="{% if request.endpoint == 'view_teachers' %}active{% endif %}">
+                            <a href="{{ url_for('view_teachers') }}">Teachers</a>
+                        </li>
+                        <li class="{% if request.endpoint == 'admin_view_classes' %}active{% endif %}">
+                            <a href="{{ url_for('admin_view_classes') }}">Classes</a>
+                        </li>
+                        <li class="{% if request.endpoint == 'admin_view_students' %}active{% endif %}">
+                            <a href="{{ url_for('admin_view_students') }}">Students</a>
+                        </li>
+                    {% elif session.get('teacher_id') %}
+                        <li class="{% if request.endpoint == 'teacher_dashboard' %}active{% endif %}">
+                            <a href="{{ url_for('teacher_dashboard') }}">Dashboard</a>
+                        </li>
+                    {% else %}
+                    {% endif %}
+                </ul>
+                <div class="user-info">
+                    {% if session.get('admin_id') or session.get('teacher_id') %}
+                        <span class="user-badge">{{ 'ADMIN' if session.get('admin_id') else 'TEACHER' }}</span>
+                        {% if session.get('teacher_id') %}
+                            <a href="{{ url_for('teacher_dashboard') }}" class="btn btn-sm btn-outline" target="_self">Classes</a>
+                        {% elif session.get('admin_id') %}
+                            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline" target="_self">Admin</a>
+                        {% endif %}
+                        <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline" target="_self">Logout</a>
+                    {% else %}
+                        <div class="signin-dropdown" id="signinDropdown">
+                            <button class="btn btn-sm btn-primary" id="signinToggle" aria-haspopup="true" aria-expanded="false">Sign In ▾</button>
+                            <div class="signin-menu" id="signinMenu" role="menu" aria-hidden="true">
+                                <a href="{{ url_for('teacher_login') }}" class="signin-item" role="menuitem">Teacher Login</a>
+                                <a href="{{ url_for('admin_login') }}" class="signin-item" role="menuitem">Admin Login</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container-lg" style="padding-top: 2rem; padding-bottom: 2rem;">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'info' }}">
+                            <span>{{ message }}</span>
+                            <span class="alert-close" onclick="this.parentElement.style.display='none';">&times;</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-bottom-row simplified" style="justify-content:center;">
+                <div class="copyright">Placement Management System by Harshith</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 5000);
+            });
+        });
+    </script>
+    <script>
+        // Prevent links/forms from unintentionally opening new tabs/windows.
+        // If a link or form explicitly wants a new tab, set `data-allow-blank="true"`.
+        document.addEventListener('click', function (e) {
+            const anchor = e.target.closest('a');
+            if (!anchor) return;
+            const href = anchor.getAttribute('href');
+            // Only act on same-origin links with a valid href
+            if (!href || href.startsWith('javascript:') || href.startsWith('#')) return;
+            try {
+                const url = new URL(href, window.location.href);
+                if (url.origin === window.location.origin) {
+                    if (anchor.target === '_blank' && anchor.dataset.allowBlank !== 'true') {
+                        e.preventDefault();
+                        window.location.href = url.href;
+                    }
+                }
+            } catch (err) {
+                // If URL parsing fails, ignore
+            }
+        }, true);
+
+        // Ensure forms do not submit to a new tab/window unless explicitly allowed
+        document.addEventListener('submit', function (e) {
+            const form = e.target;
+            if (form && form.tagName === 'FORM') {
+                if (form.target === '_blank' && form.dataset.allowBlank !== 'true') {
+                    form.target = '_self';
+                }
+            }
+        }, true);
+    </script>
+
+    <script>
+        // Header click should navigate directly to the dashboard.
+        document.addEventListener('DOMContentLoaded', function() {
+            const headerEl = document.querySelector('header');
+            const dashboardUrl = '{{ url_for("teacher_dashboard") if session.get("teacher_id") else url_for("admin_dashboard") if session.get("admin_id") else url_for("index") }}';
+            if (!headerEl) return;
+            headerEl.style.cursor = 'pointer';
+            headerEl.addEventListener('click', function(e) {
+                // Do not navigate if the click originated on an interactive control
+                if (e.target.closest('a') || e.target.closest('button') || e.target.closest('form') || e.target.closest('input')) return;
+                // navigate to the selected dashboard
+                window.location.href = dashboardUrl;
+            });
+            // Sign-in dropdown behavior
+            const signinToggle = document.getElementById('signinToggle');
+            const signinMenu = document.getElementById('signinMenu');
+            const signinDropdown = document.getElementById('signinDropdown');
+            if (signinToggle && signinMenu && signinDropdown) {
+                signinToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const expanded = this.getAttribute('aria-expanded') === 'true';
+                    this.setAttribute('aria-expanded', (!expanded).toString());
+                    signinMenu.classList.toggle('show');
+                    signinMenu.setAttribute('aria-hidden', expanded.toString());
+                });
+                // close when clicking outside
+                document.addEventListener('click', function(ev) {
+                    if (!signinDropdown.contains(ev.target)) {
+                        signinMenu.classList.remove('show');
+                        signinToggle.setAttribute('aria-expanded', 'false');
+                        signinMenu.setAttribute('aria-hidden', 'true');
+                    }
+                });
+                // close on Escape
+                document.addEventListener('keydown', function(ev) { if (ev.key === 'Escape') { signinMenu.classList.remove('show'); signinToggle.setAttribute('aria-expanded', 'false'); signinMenu.setAttribute('aria-hidden', 'true'); } });
+            }
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,538 @@
+{% extends "base.html" %}
+
+{% block title %}Class Dashboard - Placement Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-full">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>{{ class.course }}</h1>
+                <p class="text-muted">Specialisation: {{ class.specialisation }}</p>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="{{ url_for('add_student', class_id=class.id) }}" class="btn btn-primary">➕ Add Student</a>
+                <a href="{{ url_for('edit_class', class_id=class.id) }}" class="btn btn-secondary">✏️ Edit</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <div class="stat-box">
+            <div class="stat-box-value">{{ students_count }}</div>
+            <div class="stat-box-label">Total Students</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-box success">
+            <div class="stat-box-value">{{ placed_count }}</div>
+            <div class="stat-box-label">Placed</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col col-full">
+        <div class="card">
+            <div class="card-header">
+                <h3>Students</h3>
+            </div>
+
+            <!-- Search Form -->
+            <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #ddd;">
+                <form style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label style="font-size: 0.9rem; font-weight: 500; white-space: nowrap;">Search:</label>
+                    <input type="text" id="studentSearch" placeholder="" style="padding: 0.6rem; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 0.25rem; width: 300px;">
+                    <a href="#" id="clearSearch" class="btn btn-sm btn-secondary" style="font-size: 0.8rem; padding: 0.4rem; text-align: center; display: none;">Clear</a>
+                </form>
+            </div>
+
+            {% if students %}
+                <div class="table-responsive">
+                    <table class="table class-table">
+                        <thead>
+                            <tr>
+                                <th class="cell-usn">USN</th>
+                                <th class="cell-name">Name</th>
+                                <th class="cell-email">Email</th>
+                                <th class="cell-phone">Phone</th>
+                                <th class="cell-company">Company</th>
+                                <th class="cell-package">Package</th>
+                                <th class="cell-status">Status</th>
+                                <th class="cell-whatsapp">WhatsApp</th>
+                                <th class="cell-action-view">View</th>
+                                <th class="cell-action-edit">Edit</th>
+                                <th class="cell-action-delete">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in students %}
+                            <tr id="student-row-{{ student.id }}">
+                                <td class="cell-usn"><strong>{{ student.usn }}</strong></td>
+                                <td class="cell-name">{{ student.full_name }}</td>
+                                <td class="cell-email">{{ student.email_id }}</td>
+                                <td class="cell-phone">{{ student.phone_number }}</td>
+                                <td class="cell-company">{{ student.company_name or '-' }}</td>
+                                <td class="cell-package">{{ student.package or '-' }}</td>
+                                <td class="cell-status">
+                                    {% if student.company_name %}
+                                        <span class="badge badge-success">Placed</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">Unplaced</span>
+                                    {% endif %}
+                                </td>
+                                <td class="cell-whatsapp">
+                                    {% if student.company_name and student.package %}
+                                        <div class="whatsapp-status" data-student-id="{{ student.id }}" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                            {% if student.whatsapp_notification_sent %}
+                                                <span class="status-indicator" style="width: 12px; height: 12px; border-radius: 50%; background-color: #28a745;" title="WhatsApp message sent"></span>
+                                                <span style="font-size: 0.8rem; color: #28a745;">Sent</span>
+                                            {% else %}
+                                                <span class="status-indicator" style="width: 12px; height: 12px; border-radius: 50%; background-color: #dc3545;" title="Click to send WhatsApp message"></span>
+                                                <span style="font-size: 0.8rem; color: #dc3545;">Not Sent</span>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <span style="font-size: 0.8rem; color: #999;">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="cell-action-view">
+                                    <a href="{{ url_for('view_student', student_id=student.id) }}" class="btn btn-sm btn-info">View</a>
+                                </td>
+                                <td class="cell-action-edit">
+                                    <a href="{{ url_for('edit_student', student_id=student.id) }}" class="btn btn-sm btn-edit">Edit</a>
+                                </td>
+                                <td class="cell-action-delete">
+                                    <form method="POST" action="{{ url_for('delete_student', student_id=student.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure?');">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="card-body">
+                    <p class="text-center text-muted">No students in this class yet. <a href="{{ url_for('add_student', class_id=class.id) }}">Add one</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Excel Upload (Paste here inside the container / class page) -->
+<div class="row" style="margin-top:1rem;">
+    <div class="col col-full">
+        <div class="card">
+            <div class="card-header">
+                <h3>Bulk: Upload Excel (Class-specific)</h3>
+            </div>
+            <div class="card-body" style="display:flex; gap:1rem; align-items:center; flex-wrap:wrap;">
+                <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" />
+                <button id="excelPreviewBtn" class="btn btn-secondary" disabled>Preview</button>
+                <button id="excelUpdateBtn" class="btn btn-primary" disabled>Update Class (Apply)</button>
+                <div style="display:flex; gap:0.5rem; align-items:center; margin-left:0.5rem;">
+                    <a class="btn btn-outline-secondary" href="{{ url_for('download_excel_template', class_id=class.id, format='xlsx') }}">Download Template (XLSX)</a>
+                    <a class="btn btn-outline-secondary" href="{{ url_for('download_excel_template', class_id=class.id, format='csv') }}">Download Template (CSV)</a>
+                </div>
+                <div style="margin-left:1rem; font-size:0.9rem; color:#666;">
+                    Template order: USN, Name, Email, Phone number, Mother Tongue, Parent Name, Parent Email, Parent Phone, Company Name, Package (LPA)
+                </div>
+                <label style="margin-left:1rem;">
+                    <input type="checkbox" id="notifyOnUpdate" checked /> Send notifications for rows with company & package
+                </label>
+            </div>
+
+            <div class="card-body" id="excelPreviewArea" style="display:none;">
+                <h4>Preview</h4>
+                <div id="excelPreviewSummary" style="margin-bottom:0.5rem;"></div>
+                <div style="max-height:320px; overflow:auto;">
+                    <table class="table table-sm" id="excelPreviewTable">
+                        <thead><tr><th>USN</th><th>Name</th><th>Phone</th><th>Parent Phone</th><th>Company</th><th>Package</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card-footer" id="excelUpdateResult" style="display:none;">
+                <h4>Update Results</h4>
+                <div id="excelUpdateSummary"></div>
+                <div id="excelUpdateDetails" style="max-height:320px; overflow:auto;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Bulk Excel Upload -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const CLASS_ID = {{ class.id }};
+    const searchInput = document.getElementById('studentSearch');
+    const clearBtn = document.getElementById('clearSearch');
+    const tableBody = document.querySelector('table tbody');
+    
+    if (!searchInput || !tableBody) return;
+    
+    // Initial value from URL if exists
+    searchInput.value = "{{ search_query or '' }}";
+    if (searchInput.value) {
+        clearBtn.style.display = 'block';
+    }
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        const rows = tableBody.querySelectorAll('tr');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const usn = row.cells[0]?.textContent?.toLowerCase() || '';
+            const name = row.cells[1]?.textContent?.toLowerCase() || '';
+            const email = row.cells[2]?.textContent?.toLowerCase() || '';
+            
+            if (usn.includes(searchTerm) || name.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Show/hide clear button
+        if (searchTerm) {
+            clearBtn.style.display = 'block';
+        } else {
+            clearBtn.style.display = 'none';
+        }
+        
+        // Show "no results" message if needed
+        if (visibleCount === 0 && searchTerm) {
+            if (!document.getElementById('noResults')) {
+                const noResults = document.createElement('tr');
+                noResults.id = 'noResults';
+                noResults.innerHTML = '<td colspan="11" style="text-align: center; color: #999; padding: 2rem;">No matching students found</td>';
+                tableBody.appendChild(noResults);
+            }
+        } else {
+            const noResults = document.getElementById('noResults');
+            if (noResults) noResults.remove();
+        }
+    });
+    
+    // Clear button
+    clearBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        searchInput.focus();
+    });
+    
+    // WhatsApp notification click handler using event delegation
+    document.body.addEventListener('click', function(e) {
+        const statusDiv = e.target.closest('.whatsapp-status');
+        if (!statusDiv) return;
+        const studentId = statusDiv.getAttribute('data-student-id');
+        const statusSpan = statusDiv.querySelector('.status-indicator');
+        const statusText = statusDiv.querySelector('span:last-child');
+        // Check if already sent
+        if (statusText.textContent.trim() === 'Sent') {
+            alert('WhatsApp message has already been sent to this student.');
+            return;
+        }
+        // Send notification
+        sendWhatsAppNotification(studentId, statusDiv);
+    });
+});
+
+// Server-Sent Events to receive updates from the server
+    const STUDENT_ROW_URL = '{{ url_for("get_student_row", class_id=class.id, student_id=0) }}';
+    if (typeof(EventSource) !== 'undefined') {
+    const evtSource = new EventSource('{{ url_for("sse_events") }}');
+    evtSource.onmessage = function(e) {
+        try {
+            const data = JSON.parse(e.data);
+            if (!data || !data.type) return;
+            // Only handle events for this class
+            if (data.class_id && data.class_id !== CLASS_ID) return;
+                if (data.type === 'student_updated') {
+                // Fetch the updated row and replace
+                const url = STUDENT_ROW_URL.replace('/0', '/' + data.student_id);
+                fetch(url)
+                    .then(r => r.text())
+                    .then(html => {
+                        const tbody = document.querySelector('table tbody');
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newRow = doc.querySelector('tr');
+                        const existingRow = document.getElementById('student-row-' + data.student_id);
+                        if (newRow) {
+                            if (existingRow) {
+                                existingRow.replaceWith(newRow);
+                            } else {
+                                tbody.appendChild(newRow);
+                            }
+                        }
+                    });
+            } else if (data.type === 'task_queued') {
+                // Set row status to queued
+                const row = document.getElementById('student-row-' + data.student_id);
+                if (row) {
+                    const status = row.querySelector('.whatsapp-status');
+                    if (status) {
+                        status.querySelector('.status-indicator').style.backgroundColor = '#0d6efd';
+                        const textEls = status.querySelectorAll('span');
+                        if (textEls && textEls.length) textEls[textEls.length-1].textContent = 'Queued';
+                    }
+                }
+            } else if (data.type === 'task_completed') {
+                const row = document.getElementById('student-row-' + data.student_id);
+                if (row) {
+                    const status = row.querySelector('.whatsapp-status');
+                    if (status) {
+                        const indicator = status.querySelector('.status-indicator');
+                        const textEls = status.querySelectorAll('span');
+                        const statusTextEl = textEls[textEls.length-1];
+                        if (data.task === 'whatsapp') {
+                            if (data.whatsapp_notification_sent || data.status === 'sent') {
+                                indicator.style.backgroundColor = '#28a745';
+                                statusTextEl.textContent = 'Sent';
+                                statusTextEl.style.color = '#28a745';
+                            } else {
+                                indicator.style.backgroundColor = '#dc3545';
+                                statusTextEl.textContent = 'Failed';
+                                statusTextEl.style.color = '#dc3545';
+                            }
+                        }
+                        if (data.task === 'call') {
+                            // Optionally show call status somewhere; for now, keep whatsapp status area
+                        }
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Failed to process SSE message', err);
+        }
+    };
+}
+
+function sendWhatsAppNotification(studentId, element) {
+    const statusDiv = element.closest('.whatsapp-status') || element;
+    const statusSpan = statusDiv.querySelector('.status-indicator');
+    const statusText = statusDiv.querySelector('span:last-child');
+    
+    // Show loading state
+    statusSpan.style.backgroundColor = '#ffc107';
+    statusText.textContent = 'Sending...';
+    statusText.style.color = '#ffc107';
+    
+    // Send request to backend
+    fetch('{{ url_for("send_whatsapp_notification") }}', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            student_id: parseInt(studentId)
+        })
+    })
+    .then(response => response.text().then(text => {
+        let data = {};
+        try { data = text ? JSON.parse(text) : {}; } catch (e) { data = { message: text }; }
+        return { ok: response.ok, status: response.status, data };
+    }))
+    .then(obj => {
+        const data = obj.data;
+        if (!obj.ok) throw new Error(data.message || `Server responded with status ${obj.status}`);
+        if (data.success) {
+            // Update to success state (green)
+            statusSpan.style.backgroundColor = '#28a745';
+            statusText.textContent = 'Sent';
+            statusText.style.color = '#28a745';
+            alert('WhatsApp message sent successfully!');
+            // If the message was sent successfully but DB update failed, try to mark it
+            if (data.whatsapp_result && data.whatsapp_result.success && !data.db_updated) {
+                // Show syncing state
+                statusText.textContent = 'Sent (syncing...)';
+                statusText.style.color = '#0d6efd';
+                // Attempt to recover: mark DB as sent
+                markWhatsAppSent(studentId, statusSpan, statusText);
+            }
+        } else {
+            // Update to error state (red)
+            statusSpan.style.backgroundColor = '#dc3545';
+            statusText.textContent = 'Failed';
+            statusText.style.color = '#dc3545';
+            alert('Failed to send WhatsApp message: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        // Update to error state (red)
+        statusSpan.style.backgroundColor = '#dc3545';
+        statusText.textContent = 'Not Sent';
+        statusText.style.color = '#dc3545';
+        alert('Error sending WhatsApp message: ' + error.message);
+    });
+}
+
+function markWhatsAppSent(studentId, statusSpan, statusText) {
+    fetch('{{ url_for("mark_whatsapp_sent") }}', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id: parseInt(studentId) })
+    })
+    .then(r => r.text().then(text => {
+        let data = {};
+        try { data = text ? JSON.parse(text) : {}; } catch (e) { data = { message: text }; }
+        return { ok: r.ok, data };
+    }))
+    .then(obj => {
+        if (obj.ok && obj.data.success) {
+            statusSpan.style.backgroundColor = '#28a745';
+            statusText.textContent = 'Sent';
+            statusText.style.color = '#28a745';
+        } else {
+            statusSpan.style.backgroundColor = '#dc3545';
+            statusText.textContent = 'Sent (not recorded)';
+            statusText.style.color = '#dc3545';
+            alert('Message was sent but DB update failed. Please try again or contact admin.');
+        }
+    })
+    .catch(err => {
+        statusSpan.style.backgroundColor = '#dc3545';
+        statusText.textContent = 'Sent (not recorded)';
+        statusText.style.color = '#dc3545';
+        console.error('Error while marking WhatsApp sent:', err);
+    });
+}
+
+function initializeWhatsApp() {
+    // Show loading message
+    alert('Opening WhatsApp Web in your browser. Please scan the QR code with your phone.');
+    
+    fetch('{{ url_for("initialize_whatsapp_route") }}', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {'Content-Type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ WhatsApp authenticated successfully! You can now send notifications to students.');
+        } else {
+            alert('❌ Error: ' + (data.message || 'Failed to authenticate WhatsApp'));
+        }
+    })
+    .catch(error => {
+        alert('❌ Error initializing WhatsApp: ' + error.message);
+    });
+}
+
+(function() {
+    const fileInput = document.getElementById('excelFileInput');
+    const previewBtn = document.getElementById('excelPreviewBtn');
+    const updateBtn = document.getElementById('excelUpdateBtn');
+    const previewArea = document.getElementById('excelPreviewArea');
+    const previewSummary = document.getElementById('excelPreviewSummary');
+    const previewTableBody = document.querySelector('#excelPreviewTable tbody');
+    const updateResultArea = document.getElementById('excelUpdateResult');
+    const updateSummary = document.getElementById('excelUpdateSummary');
+    const updateDetails = document.getElementById('excelUpdateDetails');
+    const notifyCheckbox = document.getElementById('notifyOnUpdate');
+
+    const PREVIEW_URL = "{{ url_for('teacher_preview_excel', class_id=class.id) }}";
+    const UPDATE_URL = "{{ url_for('teacher_update_excel', class_id=class.id) }}";
+    const UPLOAD_URL = "{{ url_for('teacher_upload_excel', class_id=class.id) }}";
+
+    function enableButtons() {
+        previewBtn.disabled = !fileInput.files.length;
+        updateBtn.disabled = !fileInput.files.length;
+    }
+
+    fileInput.addEventListener('change', function() {
+        enableButtons();
+        previewArea.style.display = 'none';
+        updateResultArea.style.display = 'none';
+    });
+
+    previewBtn.addEventListener('click', function() {
+        if (!fileInput.files.length) return alert('Please choose an Excel file first.');
+        previewBtn.disabled = true;
+        const fd = new FormData();
+        fd.append('excel_file', fileInput.files[0]);
+
+        fetch(PREVIEW_URL, { method: 'POST', credentials: 'same-origin', body: fd })
+            .then(r => r.json())
+            .then(data => {
+                previewBtn.disabled = false; 
+                previewArea.style.display = '';
+                if (!data.success) {
+                    // show inline error in preview summary area
+                    previewSummary.innerHTML = `<span style="color: #b00;"><strong>Preview error:</strong> ${data.message || 'Unknown error'}</span>`;
+                    previewTableBody.innerHTML = '';
+                    return;
+                }
+                const p = data.preview;
+                previewSummary.innerHTML = `<strong>To insert:</strong> ${p.to_insert_count} &nbsp; <strong>To update:</strong> ${p.to_update_count} &nbsp; <strong>To deactivate:</strong> ${p.to_deactivate_count}`;
+                previewTableBody.innerHTML = '';
+                (data.sample || []).slice(0,50).forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${(row.usn||'').toUpperCase()}</td>
+                                    <td>${row.full_name||''}</td>
+                                    <td>${row.phone_number||''}</td>
+                                    <td>${row.parent_phone||''}</td>
+                                    <td>${row.company_name||''}</td>
+                                    <td>${row.package||''}</td>`;
+                    previewTableBody.appendChild(tr);
+                });
+                // Keep file input (we will re-upload on update)
+            })
+            .catch(err => {
+                previewBtn.disabled = false;
+                alert('Error during preview: ' + err.message);
+            });
+    });
+
+    updateBtn.addEventListener('click', function() {
+        if (!fileInput.files.length) return alert('Please choose an Excel file.');
+        if (!confirm('Apply Excel changes to this class? This will modify the database and optionally send notifications.')) return;
+        updateBtn.disabled = true;
+        updateResultArea.style.display = '';
+        updateSummary.innerHTML = 'Processing...';
+        updateDetails.innerHTML = '';
+
+        const fd = new FormData();
+        fd.append('excel_file', fileInput.files[0]);
+        fd.append('notify', notifyCheckbox.checked ? '1' : '0');
+
+        fetch(UPDATE_URL, { method: 'POST', credentials: 'same-origin', body: fd })
+            .then(r => r.json())
+            .then(data => {
+                updateBtn.disabled = false;
+                if (!data.success) {
+                    updateSummary.innerHTML = '<span style="color:red;">Update failed: ' + (data.message || 'Unknown') + '</span>';
+                    return;
+                }
+                const s = data.summary;
+                updateSummary.innerHTML = `<strong>Inserted:</strong> ${s.actions.inserted} &nbsp; <strong>Updated:</strong> ${s.actions.updated} &nbsp; <strong>Deactivated:</strong> ${s.actions.deactivated} &nbsp; <strong>Failed:</strong> ${s.actions.failed}`;
+                updateDetails.innerHTML = '<ul>' + (data.details || []).map(d => {
+                    const status = d.success ? '✅' : '❌';
+                    return `<li>${status} ${d.usn} — ${d.action}${d.notify ? ' (notifications attempted)' : ''}${d.error ? ' — ' + d.error : ''}</li>`;
+                }).join('') + '</ul>';
+                // Optionally refresh the page or part of it
+                setTimeout(()=> location.reload(), 2500);
+            })
+            .catch(err => {
+                updateBtn.disabled = false;
+                updateSummary.innerHTML = '<span style="color:red;">Update failed: ' + err.message + '</span>';
+            });
+    });
+
+    // initialize state
+    enableButtons();
+})();
+</script>
+{% endblock %}

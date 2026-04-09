@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Redirecting…{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:center; justify-content:center; min-height:60vh;">
+  <div class="card" style="padding:1.5rem; text-align:center;">
+    <p>Redirecting to Home…</p>
+    <p>If you are not redirected, <a href="{{ url_for('index') }}">click here</a>.</p>
+  </div>
+</div>
+<script>window.location.href = '{{ url_for("index") }}';</script>
+{% endblock %}

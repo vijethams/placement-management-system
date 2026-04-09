@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Class - Placement Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-full">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Edit Class</h1>
+            </div>
+            <div>
+                <a href="{{ url_for('class_dashboard', class_id=class.id) }}" class="btn btn-secondary">← Back to Class</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col col-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>Class Details</h3>
+            </div>
+
+            <form method="POST" class="card-body">
+                <div class="form-group">
+                    <label for="course" class="required">Course Name</label>
+                    <input type="text" id="course" name="course" value="{{ class_obj.course }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialisation" class="required">Specialisation</label>
+                    <input type="text" id="specialisation" name="specialisation" value="{{ class_obj.specialisation }}" required>
+                </div>
+
+                <div class="card-footer" style="border: none; padding: 0; margin-top: 2rem;">
+                    <a href="{{ url_for('class_dashboard', class_id=class_obj.id) }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h3>Class Information</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Students Enrolled:</strong> {{ class_obj.students|length }}</p>
+                <p><strong>Created:</strong> {{ class_obj.created_at.strftime('%d %b %Y') }}</p>
+                <p><strong>Status:</strong>
+                    {% if class_obj.is_active %}
+                        <span class="badge badge-success">Active</span>
+                    {% else %}
+                        <span class="badge badge-danger">Inactive</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Actions</h3>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('class_dashboard', class_id=class_obj.id) }}" class="btn btn-sm btn-block btn-info" style="margin-bottom: 0.5rem;">📊 View Dashboard</a>
+                <form method="POST" action="{{ url_for('delete_class', class_id=class_obj.id) }}" style="display: block;" onsubmit="return confirm('Are you sure? All students in this class will be deleted.');">
+                    <button type="submit" class="btn btn-sm btn-block btn-danger">🗑️ Delete Class</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

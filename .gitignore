@@ -1,0 +1,69 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Database
+*.db
+instance/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node.js
+node_modules/
+src/node/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# WhatsApp Bot
+.wwebjs_auth/
+.wwebjs_cache/
+src/node/.wwebjs_auth/
+src/node/.wwebjs_cache/
+src/node/logs/
+tokens/
+whatsapp_session/
+
+# Logs
+logs/
+*.log
+
+# Sessions
+flask_session/
+
+# Audio files (can be regenerated)
+static/audio/*.mp3
+
+# Uploads
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Environment files
+.env
+.env.local
+
+# Secret files
+instance/secret_key.txt
+
+# Temporary files
+*.tmp
+*.temp
+test_output.txt

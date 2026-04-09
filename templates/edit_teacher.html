@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Teacher - Placement Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-full">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Edit Teacher</h1>
+                <p class="text-muted">Update teacher information</p>
+            </div>
+            <div>
+                <a href="{{ url_for('view_teacher', teacher_id=teacher.id) }}" class="btn btn-secondary">← Back to Teacher</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col col-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>Teacher Details</h3>
+            </div>
+
+            <form method="POST" class="card-body">
+                <div class="form-group">
+                    <label><strong>Username:</strong> {{ teacher.user.username }}</label>
+                    <small class="form-help text-muted">Cannot be changed</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" name="full_name" value="{{ teacher.full_name or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="{{ teacher.email or '' }}">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="text" id="phone" name="phone" value="{{ teacher.phone or '' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input type="text" id="department" name="department" value="{{ teacher.department or '' }}">
+                    </div>
+                </div>
+
+                <div class="card-footer" style="border: none; padding: 0; margin-top: 2rem;">
+                    <a href="{{ url_for('view_teacher', teacher_id=teacher.id) }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-header">
+                <h3>Account Status</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Status:</strong><br>
+                    {% if teacher.user.is_active %}
+                        <span class="badge badge-success">Active</span>
+                    {% else %}
+                        <span class="badge badge-danger">Inactive</span>
+                    {% endif %}
+                </p>
+                <p><strong>Classes:</strong><br>{{ teacher.classes|length }}</p>
+                <p><strong>Total Students:</strong><br>{{ teacher.classes|sum(attribute='students')|length }}</p>
+                <p><strong>Member Since:</strong><br>{{ teacher.user.created_at.strftime('%d %b %Y') }}</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Actions</h3>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('view_teacher', teacher_id=teacher.id) }}" class="btn btn-sm btn-block btn-info" style="margin-bottom: 0.5rem;">📋 View Details</a>
+                <form method="POST" action="{{ url_for('delete_teacher', teacher_id=teacher.id) }}" style="display: block;" onsubmit="return confirm('Are you sure? This will delete the teacher and all their classes.');">
+                    <button type="submit" class="btn btn-sm btn-block btn-danger">🗑️ Delete Teacher</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

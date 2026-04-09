@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Placement Management System — Welcome{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Hero / landing page specific styles */
+.hero {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:2rem;
+  padding:3rem 1rem;
+}
+.hero .content {
+  max-width:720px;
+}
+.hero h1 {
+  font-size:2.25rem;
+  color:var(--gray-900);
+}
+.tagline { color:var(--gray-700); font-size:1.05rem; margin-top:0.25rem; }
+.hero .cta { margin-top:1.5rem; display:flex; gap:1rem; }
+.cta .btn { box-shadow: var(--shadow-sm); }
+
+/* Animated floating circles */
+.floating-bg { position: absolute; inset: 0; pointer-events:none; overflow:hidden; z-index:0; }
+.floating-bg .shape { position:absolute; border-radius:50%; opacity:0.15; animation: float 8s ease-in-out infinite; }
+.floating-bg .shape.s1 { width:220px; height:220px; left:-60px; top:-40px; background:var(--primary); animation-delay:0s; }
+.floating-bg .shape.s2 { width:120px; height:120px; right:-40px; top:120px; background:var(--primary-light); animation-delay:1.2s; }
+.floating-bg .shape.s3 { width:160px; height:160px; left:40%; top:-80px; background:var(--info); opacity:0.08; animation-delay:2s; }
+@keyframes float { 0% { transform: translateY(0) translateX(0) } 50% { transform: translateY(18px) translateX(10px) } 100% { transform: translateY(0) translateX(0) } }
+
+/* Features grid */
+.features { display:flex; gap:1rem; margin-top:2rem; }
+.feature { background:var(--white); padding:1rem; border-radius:0.5rem; box-shadow:var(--shadow-sm); width:100%; }
+.feature h4 { margin-bottom:0.5rem; color:var(--gray-900); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <div class="content">
+    <h1>Placement Management System</h1>
+    <p class="tagline">A modern, secure, and responsive application built to manage student placements, notifications (WhatsApp & voice), and campus placement workflows with real-time updates.</p>
+
+    <div class="cta">
+      <a href="{{ url_for('teacher_login') }}" class="btn btn-primary">Teacher Login</a>
+      <a href="{{ url_for('admin_login') }}" class="btn btn-outline">Admin Login</a>
+      <a href="{{ url_for('teacher_login') }}" class="btn btn-outline btn-sm" style="margin-left: 8px;">Teacher Demo</a>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <h4>Real-time Notifications</h4>
+        <p>Send WhatsApp and voice notifications automatically when students become placed.</p>
+      </div>
+      <div class="feature">
+        <h4>Bulk Operations</h4>
+        <p>Upload bulk Excel files and process updates asynchronously while keeping your UI responsive.</p>
+      </div>
+      <div class="feature">
+        <h4>Secure Authentication</h4>
+        <p>Role-based access for teachers and admins with session-based controls and safe operations.</p>
+      </div>
+    </div>
+  </div>
+  <script>
+  // Simple tagline rotation for the hero
+  document.addEventListener('DOMContentLoaded', function() {
+    const tagEl = document.querySelector('.tagline');
+    if (!tagEl) return;
+    const phrases = [
+      'A modern, secure, and responsive application',
+      'Real-time notifications and background processing',
+      'Automated WhatsApp and voice notifications',
+      'Faster bulk updates without UI blocking'
+    ];
+    let i = 0;
+    setInterval(() => {
+      tagEl.style.opacity = 0;
+      setTimeout(() => {
+        tagEl.textContent = phrases[i++ % phrases.length] + ' that helps manage student placements.';
+        tagEl.style.opacity = 1;
+      }, 400);
+    }, 4000);
+  });
+  </script>
+  <div style="flex: 0 0 380px; position:relative; z-index:1;">
+    <div class="card" style="background: linear-gradient(135deg, var(--white), #eaf6ff); border-radius:1rem; padding:1.5rem; box-shadow:var(--shadow-lg);">
+      <h3 style="margin-top:0; color:var(--primary-dark);">Quick Preview</h3>
+      <p style="color:var(--gray-700);">Track students across companies, monitor notification states, and make updates without interrupting queued background tasks.</p>
+      <div style="margin-top:1rem; display:flex; gap:0.5rem; justify-content:space-between;">
+        <div style="flex:1; padding-right:0.5rem;">
+          <strong>Placed</strong>
+          <p class="text-muted">24</p>
+        </div>
+        <div style="flex:1; padding-left:0.5rem; text-align:right;">
+          <strong>Queued</strong>
+          <p class="text-muted">3</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="floating-bg" aria-hidden="true">
+  <div class="shape s1"></div>
+  <div class="shape s2"></div>
+  <div class="shape s3"></div>
+</div>
+
+{% endblock %}
